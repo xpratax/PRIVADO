@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PRIVADO</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --glass: rgba(255,255,255,0.14);
+        --glass-strong: rgba(255,255,255,0.22);
+    }
+    *{box-sizing:border-box}
+    body {
+        margin: 0;
+        background: linear-gradient(135deg,#ff5f7e,#6a5af9 60%);
+        font-family: "Poppins", sans-serif;
+        color: #fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        height:100vh;
+    }
+
+    /* interface */
+    .card {
+        width: min(720px, 92vw);
+        background: var(--glass);
+        padding: 36px;
+        border-radius: 20px;
+        text-align: center;
+        backdrop-filter: blur(10px) saturate(120%);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+        animation: fadeIn .7s ease;
+    }
+    @keyframes fadeIn {
+        from {opacity:0; transform:scale(.9);}
+        to   {opacity:1; transform:scale(1);}
+    }
+
+    h1 {
+        margin: 0 0 18px 0;
+        font-size: clamp(22px, 4vw, 36px);
+    }
+
+    .buttons {
+        margin-top: 18px;
+        display:flex;
+        gap:14px;
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+
+    .btn {
+        padding: 12px 22px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 12px;
+        border:none;
+        cursor:pointer;
+        box-shadow:0 6px 18px rgba(0,0,0,0.16);
+        transition:.2s;
+    }
+    .yes { background: linear-gradient(180deg,#00ffb2,#00ca8b); color:#032612; }
+    .no  { background: linear-gradient(180deg,#ff6b6b,#ff3b3b); color:#fff; position:relative; }
+
+    /* toast */
+    .toast {
+        position: fixed;
+        left: 50%;
+        top: 30%;
+        transform: translate(-50%,-50%) scale(.98);
+        background: var(--glass-strong);
+        padding: 18px 24px;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.3);
+        font-weight: 700;
+        backdrop-filter: blur(6px);
+        opacity: 0;
+        transition: opacity .25s ease, transform .25s ease;
+        z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+
+    /* confetti */
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 14px;
+        top: -20px;
+        border-radius: 3px;
+        pointer-events:none;
+        z-index:80;
+    }
+    @keyframes fall {
+        to { transform: translateY(120vh) rotate(720deg); }
+    }
+
+    /* corações */
+    .heart {
+        position: fixed;
+        bottom: -20px;
+        font-size: 20px;
+        color: #ffdde9;
+        animation: subir 4s linear infinite;
+        opacity:0.7;
+        z-index:20;
+    }
+    @keyframes subir {
+        to {
+            transform: translateY(-110vh) translateX(-20px);
+            opacity:0;
+        }
+    }
+
+    /* botão som */
+    #musicBtn {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        background: rgba(255,255,255,0.32);
+        backdrop-filter: blur(5px);
+        border: none;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(0,0,0,.24);
+    }
+
+</style>
+</head>
+<body>
+
+<!-- MÚSICA -->
+<audio id="music" loop>
+    <source src="https://files.catbox.moe/cj7hqy.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicBtn">🎵 Música</button>
+
+<div class="card" id="card">
+    <h1>QUER NAMORAR COMIGO?</h1>
+    <div class="buttons">
+        <button class="btn yes" onclick="sim()">SIM</button>
+        <button class="btn no" id="noBtn" onclick="nao()">NÃO</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    let tentativas = 0;
+
+    /* Botão "SIM" */
+    function sim() {
+        confetes(80);
+        document.getElementById("card").innerHTML =
+            `<h1>YEEEHH! ❤️🥹<br>EU SABIA QUE VOCÊ IA ACEITAR!</h1>`;
+    }
+
+    /* Botão "NÃO" */
+    function nao() {
+        tentativas++;
+
+        if (tentativas === 1) {
+            toast("OCORREU UM ERRO — TENTE NOVAMENTE");
+            return;
+        }
+        if (tentativas >= 2 && tentativas <= 4) {
+            moverBotao();
+            return;
+        }
+        if (tentativas > 4) {
+            document.getElementById("noBtn").style.display = "none";
+        }
+    }
+
+    /* Toast */
+    function toast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1500);
+    }
+
+    /* Botão fugindo */
+    function moverBotao() {
+        const btn = document.getElementById("noBtn");
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 100);
+        btn.style.position = "fixed";
+        btn.style.left = x + "px";
+        btn.style.top = y + "px";
+    }
+
+    /* Confetes coloridos */
+    function confetes(n) {
+        for (let i = 0; i < n; i++) {
+            const c = document.createElement("div");
+            c.className = "confetti";
+            c.style.left = `${Math.random()*100}vw`;
+            c.style.background = `hsl(${Math.random()*360},100%,60%)`;
+            let dur = 2 + Math.random()*2;
+            c.style.animation = `fall ${dur}s linear forwards`;
+            document.body.appendChild(c);
+            setTimeout(()=>c.remove(), dur*1000);
+        }
+    }
+
+    /* CORAÇÕES FLUTUANTES INFINITOS */
+    function gerarCoracoes(){
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "❤️";
+        heart.style.left = Math.random()*100 + "vw";
+        heart.style.fontSize = (18 + Math.random()*20) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 4000);
+    }
+    setInterval(gerarCoracoes, 350);
+
+    /* Música romântica */
+    const music = document.getElementById("music");
+    const musicBtn = document.getElementById("musicBtn");
+
+    musicBtn.addEventListener("click", () => {
+        if (music.paused) {
+            music.play();
+            musicBtn.textContent = "🔇 Parar música";
+        } else {
+            music.pause();
+            musicBtn.textContent = "🎵 Música";
+        }
+    });
+</script>
+
+</body>
+</html>
